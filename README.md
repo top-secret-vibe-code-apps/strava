@@ -36,11 +36,6 @@ Before you can use this app, you need to:
 
 3. **Set up environment variables**
    Create a `.env` file in the root directory:
-   ```env
-   REACT_APP_STRAVA_CLIENT_ID=your_client_id_here
-   REACT_APP_STRAVA_CLIENT_SECRET=your_client_secret_here
-   REACT_APP_REDIRECT_URI=http://localhost:3000/auth/callback
-   ```
 
 4. **Start the development server**
    ```bash
@@ -164,3 +159,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Strava API](https://developers.strava.com/) for providing the fitness data API
 - [Create React App](https://create-react-app.dev/) for the project scaffolding
 - [Tailwind CSS](https://tailwindcss.com/) for the styling framework
+

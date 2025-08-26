@@ -11,11 +11,16 @@ class StravaService {
 
   // Check if token is expired
   isTokenExpired() {
-    if (!this.tokenExpiry) return true;
+    // Always check localStorage directly to ensure we have the latest expiry time
+    const tokenExpiry = localStorage.getItem('strava_token_expiry');
+    if (!tokenExpiry) return true;
     
     const currentTime = Date.now();
-    const expiryTime = parseInt(this.tokenExpiry);
+    const expiryTime = parseInt(tokenExpiry);
     const isExpired = currentTime > expiryTime;
+    
+    // Update instance variable to keep it in sync
+    this.tokenExpiry = tokenExpiry;
     
     console.log('Token expiration check:', {
       currentTime: new Date(currentTime).toISOString(),
@@ -57,12 +62,6 @@ class StravaService {
       if (this.isExchangingTokens) {
         console.log('Token exchange already in progress, skipping');
         return null;
-      }
-
-      // Check if we already have tokens (prevent duplicate exchange)
-      if (this.accessToken && this.refreshToken) {
-        console.log('Tokens already exist, skipping exchange');
-        return { access_token: this.accessToken, refresh_token: this.refreshToken, expires_at: this.tokenExpiry / 1000 };
       }
 
       this.isExchangingTokens = true;
@@ -157,11 +156,19 @@ class StravaService {
   }
 
   // Get authenticated axios instance
-  this getAuthenticatedInstance() {
+  getAuthenticatedInstance() {
+    // Always get the latest tokens from localStorage
+    const accessToken = localStorage.getItem('strava_access_token');
+    const tokenExpiry = localStorage.getItem('strava_token_expiry');
+    
+    // Update instance variables to keep them in sync
+    this.accessToken = accessToken;
+    this.tokenExpiry = tokenExpiry;
+    
     console.log('Getting authenticated instance:', {
-      accessToken: this.accessToken ? `${this.accessToken.substring(0, 10)}...` : 'undefined',
+      accessToken: accessToken ? `${accessToken.substring(0, 10)}...` : 'undefined',
       isExpired: this.isTokenExpired(),
-      expiryTime: this.tokenExpiry ? new Date(parseInt(this.tokenExpiry)).toISOString() : 'none'
+      expiryTime: tokenExpiry ? new Date(parseInt(tokenExpiry)).toISOString() : 'none'
     });
     
     if (this.isTokenExpired()) {
@@ -170,7 +177,7 @@ class StravaService {
 
     // Try to refresh token if it's close to expiring (within 5 minutes)
     const fiveMinutesFromNow = Date.now() + (5 * 60 * 1000);
-    if (parseInt(this.tokenExpiry) < fiveMinutesFromNow) {
+    if (tokenExpiry && parseInt(tokenExpiry) < fiveMinutesFromNow) {
       console.log('Token expires soon, attempting refresh...');
       this.refreshAccessToken().catch(error => {
         console.error('Failed to refresh token:', error);
@@ -180,14 +187,14 @@ class StravaService {
     const axiosInstance = axios.create({
       baseURL: STRAVA_CONFIG.API_BASE_URL,
       headers: {
-        'Authorization': `Bearer ${this.accessToken}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Accept': 'application/json'
       }
     });
     
     console.log('Created axios instance with headers:', {
       baseURL: STRAVA_CONFIG.API_BASE_URL,
-      Authorization: `Bearer ${this.accessToken ? this.accessToken.substring(0, 10) + '...' : 'undefined'}`
+      Authorization: `Bearer ${accessToken ? accessToken.substring(0, 10) + '...' : 'undefined'}`
     });
     
     return axiosInstance;
@@ -412,14 +419,21 @@ class StravaService {
 
   // Check if user is authenticated
   isAuthenticated() {
-    const hasToken = !!this.accessToken;
-    const isExpired = this.isTokenExpired();
-    const expiryTime = this.tokenExpiry ? new Date(parseInt(this.tokenExpiry)).toISOString() : 'none';
+    // Always check localStorage directly to ensure we have the latest tokens
+    const accessToken = localStorage.getItem('strava_access_token');
+    const tokenExpiry = localStorage.getItem('strava_token_expiry');
+    
+    const hasToken = !!accessToken;
+    const isExpired = !tokenExpiry || Date.now() > parseInt(tokenExpiry);
+    
+    // Update instance variables to keep them in sync
+    this.accessToken = accessToken;
+    this.tokenExpiry = tokenExpiry;
     
     console.log('Auth check:', {
       hasToken,
       isExpired,
-      expiryTime,
+      expiryTime: tokenExpiry ? new Date(parseInt(tokenExpiry)).toISOString() : 'none',
       currentTime: new Date().toISOString()
     });
     

@@ -1,9 +1,9 @@
 // Strava API Configuration
 export const STRAVA_CONFIG = {
   // You'll need to create a Strava app at https://www.strava.com/settings/api
-  CLIENT_ID: process.env.REACT_APP_STRAVA_CLIENT_ID || 'YOUR_CLIENT_ID',
-  CLIENT_SECRET: process.env.REACT_APP_STRAVA_CLIENT_SECRET || 'YOUR_CLIENT_SECRET',
-  REDIRECT_URI: process.env.REACT_APP_REDIRECT_URI || 'http://localhost:3000/auth/callback',
+  CLIENT_ID: process.env.REACT_APP_STRAVA_CLIENT_ID,
+  CLIENT_SECRET: process.env.REACT_APP_STRAVA_CLIENT_SECRET,
+  REDIRECT_URI: process.env.REACT_APP_REDIRECT_URI,
   AUTH_URL: 'https://www.strava.com/oauth/authorize',
   TOKEN_URL: 'https://www.strava.com/oauth/token',
   API_BASE_URL: 'https://www.strava.com/api/v3',

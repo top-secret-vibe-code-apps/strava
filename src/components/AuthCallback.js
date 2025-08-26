@@ -37,10 +37,8 @@ const AuthCallback = () => {
           setStatus('success');
         }
 
-        // Redirect to dashboard after a short delay
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 2000);
+        // Redirect to dashboard immediately after successful token exchange
+        navigate('/dashboard');
 
       } catch (err) {
         console.error('Auth callback error:', err);
